@@ -1,1 +1,1 @@
-# wx
+# A WeChat-Subscription Framework, @@ 
