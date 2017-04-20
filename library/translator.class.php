@@ -33,7 +33,7 @@ class Translator {
 	 * public array function parseJSON(string $json)
 	 */
 	public function parseJSON(string $json): array {
-		//
+		return json_decode($json);
 	}
 	
 	/**
