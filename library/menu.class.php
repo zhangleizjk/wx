@@ -119,9 +119,7 @@ class Menu {
 		]);
 		$mm = new Mimicry();
 		$url = 'https://' . $this->domain . '/cgi-bin/menu/create?access_token=' . $this->token;
-		$msg = $mm->post($url, [
-			'body'=>$json
-		]);
+		$msg = $mm->post($url, $json);
 		$end = $translator->parseJSON($msg);
 		return 0 == $end['errcode'] ? true : false;
 	}

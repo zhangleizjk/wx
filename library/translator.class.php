@@ -25,7 +25,7 @@ class Translator {
 	 * public string function createJSON(array $datas)
 	 */
 	public function createJSON(array $datas): string {
-		$end = json_encode($datas);
+		$end = json_encode($datas,  JSON_UNESCAPED_UNICODE);
 		return is_bool($end) ? 'JSON Encode Error: ' . $this->getJSONErrCode(json_last_error()) : $end;
 	}
 	
@@ -33,7 +33,7 @@ class Translator {
 	 * public array function parseJSON(string $json)
 	 */
 	public function parseJSON(string $json): array {
-		return json_decode($json);
+		return json_decode($json, true);
 	}
 	
 	/**

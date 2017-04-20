@@ -12,7 +12,7 @@ class Mimicry {
 	}
 	
 	/**
-	 * public void function __destruct(void) 
+	 * public void function __destruct(void)
 	 */
 	function __destruct() {
 		//
@@ -40,29 +40,25 @@ class Mimicry {
 	}
 	
 	/**
-	 * public string function post(string url, ?array $fields = null)
+	 * public string function post(string url, string $data)
 	 */
-	public function post(string $url, array $fields = null): string {
-		if(is_null($fields)) $fields = array();
-		$curl = curl_init();
-		curl_setopt($curl, CURLOPT_URL, $url);
-		
-		//curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
-		curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (compatible; MSIE 5.01; Windows NT 5.0)');
-		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-		curl_setopt($curl, CURLOPT_AUTOREFERER, 1);
-		curl_setopt($curl, CURLOPT_HEADER, false);
-		curl_setopt($curl, CURLOPT_POST, true);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $fields);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		$data = curl_exec($curl);
-		echo curl_error($curl);
-		curl_close($curl);
-		var_dump($data);
-		die();
-		return $data;
+	public function post(string $url, string $data): string {
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (compatible; MSIE 5.01; Windows NT 5.0)');
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$end = curl_exec($ch);
+		die($end);
+		if(is_bool($end)) $end = '{"errcode":-12,"errmsg":"'.curl_error($ch).'"}';
+		curl_close($ch);
+		return $end;
 	}
 	//
 }
