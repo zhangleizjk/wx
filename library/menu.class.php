@@ -19,120 +19,115 @@ class Menu {
 	/**
 	 */
 	protected $domain;
-	protected $accessToken;
-	protected $menus=array();
+	protected $token;
+	protected $menus = [];
 	
 	/**
-	 *
-	 * @param string $token        	
-	 * @param ?string $domain = null
-	 * @return void
+	 * public void function __construct(string $token, string $domain = null)
 	 */
 	public function __construct(string $token, string $domain = null) {
 		$this->domain = is_null($domain) ? 'api.weixin.qq.com' : $domain;
-		$this->accessToken = $token;
+		$this->token = $token;
 	}
 	
 	/**
-	 * @reutrn void
+	 * public void function __destruct(void)
 	 */
 	function __destruct() {
 		//
 	}
 	
 	/**
-	 *
-	 * @param string $name        	
-	 * @param string $url        	
-	 * @return array
+	 * public array function createMenu(string $name)
+	 */
+	public function createMenu(string $name): array {
+		return [
+			'name'=>$name, 
+			'sub_button'=>[]
+		];
+	}
+	
+	/**
+	 * public array function createView(string $name, string $url)
 	 */
 	public function createView(string $name, string $url): array {
-		return array(
+		return [
 			'type'=>'view', 
 			'name'=>$name, 
 			'url'=>$url
-		);
+		];
 	}
 	
 	/**
 	 * public array function createClick(string $name, string $key, string $type = self::click_custom)
 	 */
 	public function createClick(string $name, string $key, string $type = self::click_custom): array {
-		return array(
+		return [
 			'type'=>$type, 
 			'name'=>$name, 
 			'key'=>$key
-		);
+		];
 	}
 	
 	/**
-	 *
-	 * @param string $name        	
-	 * @param string $id        	
-	 * @param string $type        	
-	 * @return array
+	 * public array creatgeMedia(string $name, string $id, string $type = self::media_all)
 	 */
 	public function createMedia(string $name, string $id, string $type = self::media_all): array {
-		return array(
+		return [
 			'type'=>$type, 
 			'name'=>$name, 
 			'media_id'=>$id
-		);
+		];
 	}
 	
 	/**
-	 *
-	 * @param string $name        	
-	 * @param string $url        	
-	 * @param string $appId        	
-	 * @param string $pagePath        	
-	 * @return array
+	 * public array function createMiniProgram(string $name, string $url, string $appId, string $pagePath)
 	 */
 	public function createMiniProgram(string $name, string $url, string $appId, string $pagePath): array {
-		return array(
+		return [
 			'type'=>'miniprogram', 
 			'name'=>$name, 
 			'url'=>$url, 
 			'appid'=>$appId, 
 			'pagepath'=>$pagePath
-		);
+		];
 	}
 	
 	/**
-	 * 
-	 * @param array $menu
-	 * @param array $button
-	 * @return array
+	 * public array function addMenu(array $menu)
 	 */
-	public function addSubMenu(array $menu,array $button):array {
-		if(!isset($menu['sub_button'])) $menu['sub_button']=array();
-		$menu['sub_button'][]=$button;
+	public function addMenu(array $menu): array {
+		$this->menus[] = $menu;
+		return $this->menus;
+	}
+	
+	/**
+	 * public function addSubMenu(array $menu, array $sub)
+	 */
+	public function addSubMenu(array $menu, array $sub): array {
+		$menu['sub_button'][] = $sub;
 		return $menu;
 	}
 	
 	/**
-	 * 
-	 * @param array $button
-	 * @return array
+	 * public boolean function create(void)
 	 */
-	public function addMenu(array $button):array{
-		if(!isset($this->menus['button'])) $this->menus['button']=array();
-		$this->menus['button'][]=$button;
-		return $button;
+	public function create(): bool {
+		$translator = new Translator();
+		$json = $translator->createJSON([
+			'button'=>$this->menus
+		]);
+		$mm = new Mimicry();
+		$url = 'https://' . $this->domain . '/cgi-bin/menu/create?access_token=' . $this->token;
+		$msg = $mm->post($url, [
+			'body'=>$json
+		]);
+		$end = $translator->parseJSON($msg);
+		return 0 == $end['errcode'] ? true : false;
 	}
 	
 	/**
-	 * 
-	 */
-	public function create():bool{
-		$translator=new Translator();
-		$json=$translator->createJSON($this->menus);
-		$mimicry=new Mimicry();
-		$end=$mimicry->post($url, array('body'=>$json));
-	}
-	
-	/**
-	 * @return boolean
+	 * public boolean function delete(void)
 	 */
 	public function delete(): bool {
 		$url = 'https://' . $this->domain . '/cgi-bin/menu/delete';
@@ -141,8 +136,19 @@ class Menu {
 		);
 		$mm = new Mimicry();
 		$json = $mm->get($url, $qryStrings);
-		$ends = json_decode($json);
-		return 'ok' == $ends['errmsg'] ? true : false;
+		$translator = new Translator();
+		$ends = $translator->parseJSON($json);
+		return 0 == $ends['errcode'] ? true : false;
+	}
+	
+	/**
+	 * public string function getMenus(void)
+	 */
+	public function getMenus(): string {
+		$translator = new Translator();
+		return $translator->createJSON([
+			'button'=>$this->menus
+		]);
 	}
 	
 	//

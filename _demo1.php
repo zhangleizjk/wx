@@ -1,16 +1,17 @@
 <?php
 use SporeAura\WX\Mimicry;
 use SporeAura\WX\Translator;
+use SporeAura\WX\Menu;
 
 require_once './library/mimicry.class.php';
 require_once './library/translator.class.php';
+require_once './library/menu.class.php';
 
-$menu=array(
-		'type'=>'b"utton',
-		'name'=>'官方网站',
-		'key_value'=>'2354387987897897453453453453453'
-		
-);
-$translator=new Translator();
-$json=$translator->createJSON($menu);
-echo $json;
+$token='1095dd011629d4875601a3b05272d141';
+
+
+/* 最简单的示例 */
+$ui=new Menu($token);
+$ui->addMenu($ui->createView('Home Page', 'http://www.sporeaura.com'));
+echo $ui->getMenus();
+
