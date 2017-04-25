@@ -55,9 +55,9 @@ class Translator {
 			$childNode->appendChild($leaf);
 		}
 		try{
-			$end=$doc->saveXML();
+			$end = $doc->saveXML();
 		}catch(DOMException $err){
-			$end='';
+			$end = '';
 		}
 		return $end;
 	}
@@ -65,32 +65,33 @@ class Translator {
 	/**
 	 * public array function parseXML(string $xml)
 	 */
-	public function parseXML(string $xml): array {
-		$datas=[];
+	public function parseXML(string $xml, bool $root = false){
+		if($root)$xml='<xml>'.$xml.'</xml>';
 		$doc = new DOMDocument('1.0', 'utf-8');
 		$doc->loadXML($xml);
-		$nodes=$doc->getElementsByTagName('xml');
-		$node=$nodes->length ? $nodes->item(0) : $doc->documentElement ;
-		$node->normalize();
-		$name=$node->tagName;
-		foreach($node->childNodes as $childNode){
-			switch($childNode->nodeType){
-				case XML_TEXT_NODE:
-					$data=$childNode->wholeText;
-					in_array($name, ['xml','node'], true) ? $datas[]=$data : $datas[$name]=$data;
-					break 2;
-				case XML_CDATA_SECTION_NODE:
-					$data=$childNode->wholeText;
-					in_array($name, ['xml','node'], true) ? $datas[]=$data : $datas[$name]=$data;
-					break 2;
-				case XML_ELEMENT_NODE:
-					$childXml=$doc->saveXML($childNode);
-					in_array($name, ['xml','node'], true) ? $datas[]=$this->parseXML($childXml) : $datas[$name]=$this->parseXML($childXml);
-					break 2;
-				default: 
-					break 2;
+		$node = $doc->documentElement;
+		$name = $node->nodeName;
+		$children = $node->childNodes;
+		$yesNodeTypes = [XML_TEXT_NODE, XML_CDATA_SECTION_NODE, XML_ELEMENT_NODE];
+		$yesEndNodeTypes = [XML_TEXT_NODE, XML_CDATA_SECTION_NODE];
+		foreach($children as $child){
+			if(!in_array($child->nodeType, $yesNodeTypes, true)) $node->removeChild($child);
+		}
+		$length = $children->length;
+		
+		if(0 == $length) $datas = null;
+		elseif(1 == $length && in_array($children->item(0)->nodeType, $yesEndNodeTypes, true)) $datas = $child->wholeText;
+		else{
+			$datas = [];
+			foreach($children as $child){
+				if(in_array($child->nodeType, $yesEndNodeTypes, true)){
+					$datas[] = $child->wholeText;
+				}else{
+					$datas[$child->nodeName] = $this->parseXML($doc->saveXML($child));
+				}
 			}
 		}
+		
 		return $datas;
 	}
 	//

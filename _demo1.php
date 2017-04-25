@@ -17,7 +17,7 @@ require_once './library/menu.class.php';
 //var_dump($ui->create());
 
 
-$xml='<node><![CDATA[toUser]]></node>';
+$xml='<school>zhangsan<grade>XXXX</grade>Tom</school>';
 $t=new Translator();
-$arr=$t->parseXML($xml);
+$arr=$t->parseXML($xml, true);
 print_r($arr);
